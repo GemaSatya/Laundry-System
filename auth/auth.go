@@ -4,24 +4,38 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"text/template"
 	"time"
 
 	"github.com/GemaSatya/LaundrySystem/database"
 	"github.com/GemaSatya/LaundrySystem/model"
 )
 
-func RegisterUser(w http.ResponseWriter, r *http.Request) {
+/* func RegisterUser(w http.ResponseWriter, r *http.Request) {
 	// Implementation for user registration
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
+	var requestData struct{
+		Username string `json:"username"`
+		Password string `json:"password"`
+		Email    string `json:"email"`
+	}
+
 	// Parse form data
-	username := r.FormValue("username")
-	password := r.FormValue("password")
-	email := r.FormValue("email")
+	// username := r.FormValue("username")
+	// password := r.FormValue("password")
+	// email := r.FormValue("email")
+
+	if err := json.NewDecoder(r.Body).Decode(&requestData); err != nil {
+		http.Error(w, "Invalid JSON body", http.StatusBadRequest)
+		return
+	}
+
+	username := requestData.Username
+	password := requestData.Password
+	email := requestData.Email
 
 	if !SearchUser(username) {
 		http.Error(w, "Username already exists", http.StatusConflict)
@@ -49,30 +63,30 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte("User registered successfully"))
-}
+} */
 
 func LoginUser(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodGet {
-		// Serve login form
-		errorMsg := r.URL.Query().Get("error")
-		data := struct {
-			Error string
-		}{
-			Error: errorMsg,
-		}
+	// if r.Method == http.MethodGet {
+	// 	// Serve login form
+	// 	errorMsg := r.URL.Query().Get("error")
+	// 	data := struct {
+	// 		Error string
+	// 	}{
+	// 		Error: errorMsg,
+	// 	}
 
-		t, err := template.ParseFiles("auth/login.html")
-		if err != nil {
-			http.Error(w, "Failed to load template", http.StatusInternalServerError)
-			return
-		}
+	// 	t, err := template.ParseFiles("auth/login.html")
+	// 	if err != nil {
+	// 		http.Error(w, "Failed to load template", http.StatusInternalServerError)
+	// 		return
+	// 	}
 
-		if err := t.Execute(w, data); err != nil {
-			http.Error(w, "Failed to render template", http.StatusInternalServerError)
-			return
-		}
-		return
-	}
+	// 	if err := t.Execute(w, data); err != nil {
+	// 		http.Error(w, "Failed to render template", http.StatusInternalServerError)
+	// 		return
+	// 	}
+	// 	return
+	// }
 
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)

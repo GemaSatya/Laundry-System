@@ -24,7 +24,7 @@ func ConnectDatabase(){
 		panic(err)
 	}
 
-	database.AutoMigrate(&model.User{}, &model.Report{}, &model.Payment{}, &model.OrderDetail{}, &model.Order{}, &model.Customer{})
+	database.AutoMigrate(&model.User{}, &model.Report{}, &model.Payment{}, &model.OrderDetail{}, &model.Order{}, &model.Customer{}, &model.Login{})
 
 	DB = database
 }

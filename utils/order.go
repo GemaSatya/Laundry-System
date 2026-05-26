@@ -50,6 +50,18 @@ func GetAllOrders() ([]model.Order, error) {
 	return orders, nil
 }
 
+// GetOrdersByCustomerID fetches all orders that belong to a specific customer.
+func GetOrdersByCustomerID(customerID int) ([]model.Order, error) {
+	var orders []model.Order
+
+	result := database.DB.Preload("OrderDetail").Where("order_id = ?", customerID).Find(&orders)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return orders, nil
+}
+
 // GetOrderByIDHandler is an HTTP handler to fetch order details by ID
 func GetOrderByIDHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
@@ -88,6 +100,44 @@ func GetAllOrdersHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	orders, err := GetAllOrders()
+	if err != nil {
+		http.Error(w, "Failed to fetch orders", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(orders)
+}
+
+// GetMyOrdersHandler returns orders for a single customer.
+func GetMyOrdersHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	customerIDValue := r.URL.Query().Get("customer_id")
+	if customerIDValue == "" {
+		customerIDValue = r.Header.Get("X-Customer-Id")
+	}
+	if customerIDValue == "" {
+		http.Error(w, "customer_id is required", http.StatusBadRequest)
+		return
+	}
+
+	customerID, err := strconv.Atoi(customerIDValue)
+	if err != nil || customerID <= 0 {
+		http.Error(w, "Invalid customer_id", http.StatusBadRequest)
+		return
+	}
+
+	var customer model.Customer
+	if err := database.DB.First(&customer, customerID).Error; err != nil {
+		http.Error(w, "Customer not found", http.StatusNotFound)
+		return
+	}
+
+	orders, err := GetOrdersByCustomerID(customerID)
 	if err != nil {
 		http.Error(w, "Failed to fetch orders", http.StatusInternalServerError)
 		return

@@ -4,7 +4,6 @@ import "gorm.io/gorm"
 
 type User struct {
 	gorm.Model
-	UserId int
 	Nama     string
 	Username string
 	Email    string
